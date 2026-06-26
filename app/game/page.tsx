@@ -116,10 +116,6 @@ function GamePageContent() {
 
   const [player, setPlayer] =
     useState<any>(null);
-  
-  const [devColor,
-  setDevColor] =
-  useState("");  
 
   const [roomData, setRoomData] =
     useState<any>(null);
@@ -169,22 +165,10 @@ const [secondVote,
         
         if (!playerId) return;
 
-        let me;
-
-if (devColor) {
-  me =
-    data.players?.find(
-      (p: any) =>
-        p.color ===
-        devColor
-    );
-} else {
-  me =
-    data.players?.find(
-      (p: any) =>
-        p.id === playerId
-    );
-}
+const me =
+  data.players?.find(
+    (p: any) => p.id === playerId
+  );
 
         if (me) {
           setPlayer(me);
@@ -195,8 +179,7 @@ if (devColor) {
     return () => unsub();
   }, [
   roomId,
-  devColor,
-]);
+  ]);
 
 async function handleIdentify(
   animal: string
@@ -413,34 +396,7 @@ const hasSubmittedIdentify =
   </div>
 </div>
 
-  <div className="font-bold mb-2">
-    開發者切換角色
-  </div>
-
-  <div className="flex flex-wrap gap-2">
-
-    {roomData?.players?.map(
-      (p: any) => (
-        <button
-          key={p.color}
-          onClick={() =>
-            setDevColor(
-              p.color
-            )
-          }
-          className={`border rounded px-3 py-2 ${
-            devColor === p.color
-              ? "bg-red-500 text-white"
-              : ""
-          }`}
-        >
-          {p.color}
-        </button>
-      )
-    )}
-
-  </div>
-
+   
 </div>
 
 )}
