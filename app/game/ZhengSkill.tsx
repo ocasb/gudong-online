@@ -78,10 +78,12 @@ export function ZhengSkill({
           }
 
           await useZhengSkill(
-            roomId,
-            round,
-            selectedAnimal
-          );
+  roomId,
+  round,
+  player.color,
+  player.role,
+  selectedAnimal
+);
         }}
         className="mt-4 w-full bg-blue-600 text-white rounded p-3 disabled:bg-gray-400"
       >

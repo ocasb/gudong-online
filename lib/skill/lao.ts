@@ -4,10 +4,13 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../firebase";
+import { addPlayerHistory } from "../history";
 
 export async function useLaoSkill(
   roomId: string,
-  round: number
+  round: number,
+  actorColor: string,
+  actorRole: string
 ) {
   const roomRef = doc(
     db,
@@ -22,4 +25,17 @@ export async function useLaoSkill(
     [`gameState.roundSkills.${roundKey}.lao.enabled`]:
       true,
   });
+
+  await addPlayerHistory(
+    roomId,
+    actorColor,
+    {
+      round,
+      actorColor,
+      actorRole,
+      type: "reverse_result",
+      note:
+        "發動技能，之後所有玩家的鑑定結果反轉",
+    }
+  );
 }

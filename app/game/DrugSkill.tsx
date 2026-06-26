@@ -80,10 +80,12 @@ export function DrugSkill({
           if (!roomId) return;
 
           await useDrugSkill(
-            roomId,
-            round,
-            targetColor
-          );
+  roomId,
+  round,
+  player.color,
+  player.role,
+  targetColor
+);
         }}
         className="mt-4 w-full bg-red-600 text-white rounded p-3 disabled:bg-gray-400"
       >

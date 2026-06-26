@@ -50,9 +50,11 @@ return (
         if (!roomId) return;
 
         await useLaoSkill(
-          roomId,
-          round
-        );
+  roomId,
+  round,
+  player.color,
+  player.role
+);
       }}
       className="mt-4 w-full bg-red-600 text-white rounded p-3"
     >

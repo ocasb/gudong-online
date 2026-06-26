@@ -7,6 +7,7 @@ import { db } from "./firebase";
 import { shouldReverseByLao } from "./skill/checkLao";
 import { shouldBlockByZheng } from "./skill/checkZheng";
 import { shouldDebuffBlock } from "./skill/checkDebuff";
+import { addPlayerHistory } from "./history";
 
 export async function identifyAnimal(
   roomId: string,
@@ -46,16 +47,30 @@ if (
 ) {
   return null;
 }
-  let result = animals[animal];
+  const realResult = animals[animal];
 
-  if (
-    shouldReverseByLao(
-      data,
-      player
-    )
-  ) {
-    result = !result;
-  }
+let result = realResult;
 
-  return result;
+if (
+  shouldReverseByLao(
+    data,
+    player
+  )
+) {
+  result = !result;
+}
+
+await addPlayerHistory(roomId, player.color, {
+  round: data.gameState.round,
+  actorColor: player.color,
+  actorRole: player.role,
+  type: "identify_animal",
+  target: animal,
+  result: result ? "真品" : "贗品",
+  note: `${player.color} 鑑定 ${animal}，結果：${
+    result ? "真品" : "贗品"
+  }`,
+});
+
+return result;
 }

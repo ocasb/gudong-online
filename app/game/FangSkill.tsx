@@ -134,10 +134,13 @@ export function FangSkill({
           );
 
           await useFangSkill(
-            roomId,
-            round,
-            targetColor
-          );
+  roomId,
+  round,
+  player.color,
+  player.role,
+  targetColor,
+  camp
+);
         }}
         className="mt-4 w-full bg-blue-600 text-white rounded p-3 disabled:bg-gray-400"
       >

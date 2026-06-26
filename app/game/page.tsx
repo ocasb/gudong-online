@@ -45,6 +45,8 @@ import { ZhengSkill } from "./ZhengSkill";
 
 import { FangSkill } from "./FangSkill";
 
+import { HistoryModal } from "./HistoryModal";
+
 const DEV_MODE = true;
 
 const ROLE_INFO: any = {
@@ -145,6 +147,9 @@ const [secondVote,
   const [identifyTarget,
   setIdentifyTarget] =
   useState("");
+
+  const [showHistory, setShowHistory] =
+  useState(false);
 
   useEffect(() => {
     if (!roomId) return;
@@ -336,6 +341,11 @@ async function submitVoteResult() {
   );
 }
 
+const myHistory =
+  roomData?.gameState?.playerHistory?.[
+    player?.color
+  ] || [];
+
 const hasSubmittedIdentify =
   !!roomData?.gameState?.identifyVotes?.[player?.color];
 
@@ -363,9 +373,11 @@ const hasSubmittedIdentify =
       <h1 className="text-3xl font-bold">
         古董局中局 Online
       </h1>
+  
+ 
      {DEV_MODE && (
 
-      <div className="border rounded p-4 w-96">
+        <div className="border rounded p-4 w-96">
 
 <div className="mt-4 border rounded p-3 bg-gray-100">
   <div className="text-sm font-bold mb-2">
@@ -417,9 +429,9 @@ const hasSubmittedIdentify =
   {player.name}
 </div>
 
-<div>
-  Host：
-  {String(player?.isHost)}
+<div className="text-xl font-bold">
+  你的角色：{player?.role}
+  {player?.isHost && " 🏠"}
 </div>
 
 </>
@@ -454,8 +466,20 @@ const hasSubmittedIdentify =
 
 <div className="mt-4 border rounded p-4">
 
-  <div>
-    第 {roomData?.gameState?.round} / 3 回合
+  <div className="flex items-center justify-between">
+
+    <div>
+      第 {roomData?.gameState?.round} / 3 回合
+    </div>
+
+    <button
+      onClick={() => setShowHistory(true)}
+      className="text-xl hover:scale-110 transition"
+      title="遊戲歷程"
+    >
+      🔍
+    </button>
+
   </div>
 
 </div>
@@ -1032,6 +1056,13 @@ roomData?.gameState
             色玩家行動...
          </div>
 ) : null}
+
+        <HistoryModal
+          open={showHistory}
+          onClose={() => setShowHistory(false)}
+          history={myHistory}
+        />
+
 
       </div>
     </main>
