@@ -79,12 +79,65 @@ export function DrugSkill({
         onClick={async () => {
           if (!roomId) return;
 
-          await useDrugSkill(
+          const actedPlayers =
+  roomData?.gameState?.actedPlayers || [];
+
+function getDebuffRound(color: string) {
+  return actedPlayers.includes(color)
+    ? round + 1
+    : round;
+}
+
+const debuffs: {
+  color: string;
+  round: number;
+}[] = [];
+
+const targetPlayer =
+  roomData.players.find(
+    (p: any) => p.color === targetColor
+  );
+
+if (!targetPlayer) return;
+
+if (targetPlayer.role === "方震") {
+  const fang =
+    roomData.players.find(
+      (p: any) => p.role === "方震"
+    );
+
+  const xuyuan =
+    roomData.players.find(
+      (p: any) => p.role === "許願"
+    );
+
+  if (fang) {
+    debuffs.push({
+      color: fang.color,
+      round: getDebuffRound(fang.color),
+    });
+  }
+
+  if (xuyuan) {
+    debuffs.push({
+      color: xuyuan.color,
+      round: getDebuffRound(xuyuan.color),
+    });
+  }
+} else {
+  debuffs.push({
+    color: targetColor,
+    round: getDebuffRound(targetColor),
+  });
+}
+
+await useDrugSkill(
   roomId,
   round,
   player.color,
   player.role,
-  targetColor
+  targetColor,
+  debuffs
 );
         }}
         className="mt-4 w-full bg-red-600 text-white rounded p-3 disabled:bg-gray-400"
