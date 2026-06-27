@@ -2,18 +2,22 @@ export function isDrugTarget(
   roomData: any,
   player: any
 ) {
+  if (!roomData || !player) {
+    return false;
+  }
+
   const round =
     roomData?.gameState?.round;
 
-  const roundKey =
-    `round${round}`;
+  const byPending =
+    roomData?.gameState?.pendingAttacks?.includes(
+      player.color
+    );
 
-  const debuffedPlayers =
+  const byRound =
     roomData?.gameState?.debuffs?.[
-      roundKey
-    ] || [];
+      `round${round}`
+    ]?.includes(player.color);
 
-  return debuffedPlayers.includes(
-    player?.color
-  );
+  return byPending || byRound;
 }

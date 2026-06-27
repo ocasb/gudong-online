@@ -29,10 +29,22 @@ export async function useDrugSkill(
   const roundKey =
     `round${round}`;
 
-  const updateData: any = {
-    [`gameState.roundSkills.${roundKey}.drug.targetColor`]:
-      targetColor,
-  };
+  const attackColors =
+  debuffs.map((d) => d.color);
+
+const pendingColors = debuffs
+  .filter((debuff) => debuff.round === round)
+  .map((debuff) => debuff.color);
+
+const updateData: any = {
+  [`gameState.roundSkills.${roundKey}.drug.targetColor`]:
+    targetColor,
+};
+
+if (pendingColors.length > 0) {
+  updateData["gameState.pendingAttacks"] =
+    arrayUnion(...pendingColors);
+}
 
   debuffs.forEach((debuff) => {
     updateData[

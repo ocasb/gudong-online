@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useFangSkill } from "../../lib/skill/fang";
+import { isDrugTarget } from "../../lib/skill/checkDrug";
 
 export function FangSkill({
   roomId,
@@ -12,6 +13,15 @@ export function FangSkill({
   roomData: any;
   player: any;
 }) {
+
+  const drugged =
+  roomData && player
+    ? isDrugTarget(roomData, player)
+    : false;
+
+if (drugged) {
+  return null;
+}
   const [targetColor, setTargetColor] =
     useState("");
 

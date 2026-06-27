@@ -151,6 +151,7 @@ const [secondVote,
   const [showHistory, setShowHistory] =
   useState(false);
 
+
   useEffect(() => {
     if (!roomId) return;
 
@@ -283,28 +284,30 @@ const usedFang =
     `round${round}`
   ]?.fang;
 
-if (player?.role === "方震") {
-  if (!usedFang) {
-    setTurnError(
-      "請先選擇要鑑定的玩家"
-    );
-    return;
+if (!drugged) {
+  if (player?.role === "方震") {
+    if (!usedFang) {
+      setTurnError(
+        "請先選擇要鑑定的玩家"
+      );
+      return;
+    }
+  } else if (player?.role === "許願") {
+    if (!hasIdentified) {
+      setTurnError(
+        "請完成兩件寶物的鑑定"
+      );
+      return;
+    }
+  } else {
+    if (!hasIdentified) {
+      setTurnError(
+        "請先選擇要鑑定的寶物"
+      );
+      return;
+    }
   }
-} else if (player?.role === "許願") {
-  if (!hasIdentified) {
-    setTurnError(
-      "請完成兩件寶物的鑑定"
-    );
-    return;
-  }
-} else {
-  if (!hasIdentified) {
-    setTurnError(
-      "請先選擇要鑑定的寶物"
-    );
-    return;
-  }
-} 
+}
   
   if (!roomId) return;
 
@@ -356,6 +359,20 @@ const hasSubmittedIdentify =
         player
       )
     : false;
+
+  const currentRound =
+    roomData?.gameState?.round;
+
+  const usedFangForPass =
+    !!roomData?.gameState?.roundSkills?.[
+      `round${currentRound}`
+    ]?.fang;
+
+  const canPassTurn =
+    drugged ||
+    hasIdentified ||
+    (player?.role === "方震" &&
+      usedFangForPass);
 
   if (!player) {
     return (
@@ -895,167 +912,152 @@ const hasSubmittedIdentify =
 )}
 
         {roomData?.gameState?.phase ===
-  "action" &&
-roomData?.gameState
-  ?.currentPlayerColor ===
-  player.color ? (
-
+          "action" &&
+        roomData?.gameState
+          ?.currentPlayerColor ===
+          player.color ? (
           <>
             <div className="mt-4 text-green-600 font-bold">
-  輪到你行動
-</div>
-
-{drugged ? (
-
-  <div className="mt-4 border rounded p-4 bg-red-100">
-
-    <div className="font-bold text-red-600">
-      你被藥不然偷襲！
-    </div>
-
-    <div className="mt-2">
-      本回合不能鑑寶。
-    </div>
-
-  </div>
-
-) : (
-
-<>
-
-<DrugSkill
-  roomId={roomId}
-  roomData={roomData}
-  player={player}
-  />
-
-  <LaoSkill
-  roomId={roomId}
-  roomData={roomData}
-  player={player}
-/>
-
-<ZhengSkill
-  roomId={roomId}
-  roomData={roomData}
-  player={player}
-/>
-
-<FangSkill
-  roomId={roomId}
-  roomData={roomData}
-  player={player}
-/>
-
-
-{player?.role !== "方震" && (
-  <>
-            <div className="mt-4">
-              本回合寶物
+              輪到你行動
             </div>
 
-            <div className="grid grid-cols-2 gap-2 mt-2">
+            {drugged ? (
+              <div className="mt-4 border rounded p-4 bg-red-100">
+                <div className="font-bold text-red-600">
+                  你被藥不然偷襲！
+                </div>
 
-              {roomData?.gameState?.currentAnimals?.map(
-                (
-                  animal: string
-                ) => (
-                  <button
-  key={animal}
-  disabled={hasIdentified}
-  onClick={() =>
-    handleIdentify(
-      animal
-    )
-  }
-  className="border rounded p-3"
->
-                    {animal}
-                  </button>
-                )
-              )}
-
-            </div>
-
-            {identifiedResult && (
-              <div className="mt-4 text-xl font-bold text-blue-600">
-                {identifiedResult}
+                <div className="mt-2">
+                  本回合不能鑑寶 / 鑑人，但可以指定下一位玩家。
+                </div>
               </div>
+            ) : (
+              <>
+                <DrugSkill
+                  roomId={roomId}
+                  roomData={roomData}
+                  player={player}
+                />
+
+                <LaoSkill
+                  roomId={roomId}
+                  roomData={roomData}
+                  player={player}
+                />
+
+                <ZhengSkill
+                  roomId={roomId}
+                  roomData={roomData}
+                  player={player}
+                />
+
+                {!drugged && (
+  <FangSkill
+    roomId={roomId}
+    roomData={roomData}
+    player={player}
+  />
+)}
+
+                {player?.role !== "方震" && (
+                  <>
+                    <div className="mt-4">
+                      本回合寶物
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      {roomData?.gameState?.currentAnimals?.map(
+                        (animal: string) => (
+                          <button
+                            key={animal}
+                            disabled={hasIdentified}
+                            onClick={() =>
+                              handleIdentify(animal)
+                            }
+                            className="border rounded p-3"
+                          >
+                            {animal}
+                          </button>
+                        )
+                      )}
+                    </div>
+
+                    {identifiedResult && (
+                      <div className="mt-4 text-xl font-bold text-blue-600">
+                        {identifiedResult}
+                      </div>
+                    )}
+
+                    {hasIdentified && (
+                      <div className="mt-3 text-green-600 font-bold">
+                        ✅ 已完成鑑寶
+                      </div>
+                    )}
+
+                    <hr className="my-4" />
+                  </>
+                )}
+              </>
             )}
-{hasIdentified && (
-  <div className="mt-3 text-green-600 font-bold">
-    ✅ 已完成鑑寶
-  </div>
-)}
-            <hr className="my-4" />
 
-            </>
-)}</>
-)}
-            <div className="font-bold">
-  指定下一位玩家
-</div>
+            {canPassTurn && (
+              <>
+                <div className="font-bold">
+                  指定下一位玩家
+                </div>
 
-<div className="flex flex-wrap gap-2 mt-2">
-
-  {roomData?.players?.filter(
-    (p: any) =>
-      !roomData.gameState.actedPlayers.includes(
-        p.color
-      ) &&
-      p.color !== player.color
-  ).length > 0 ? (
-
-    roomData?.players
-      ?.filter(
-        (p: any) =>
-          !roomData.gameState.actedPlayers.includes(
-            p.color
-          ) &&
-          p.color !== player.color
-      )
-      .map(
-        (p: any) => (
-          <button
-            key={p.color}
-            onClick={() =>
-              handlePassTurn(
-                p.color
-              )
-            }
-            className="border rounded px-3 py-2"
-          >
-            {p.color}
-          </button>
-        )
-      )
-
-  ) : (
-
-    <button
-      onClick={() =>
-        handlePassTurn("")
-      }
-      className="bg-red-500 text-white rounded px-4 py-2"
-    >
-      結束本回合
-    </button>
-
-  )}
-
-            </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {roomData?.players?.filter(
+                    (p: any) =>
+                      !roomData.gameState.actedPlayers.includes(
+                        p.color
+                      ) &&
+                      p.color !== player.color
+                  ).length > 0 ? (
+                    roomData?.players
+                      ?.filter(
+                        (p: any) =>
+                          !roomData.gameState.actedPlayers.includes(
+                            p.color
+                          ) &&
+                          p.color !== player.color
+                      )
+                      .map((p: any) => (
+                        <button
+                          key={p.color}
+                          onClick={() =>
+                            handlePassTurn(p.color)
+                          }
+                          className="border rounded px-3 py-2"
+                        >
+                          {p.color}
+                        </button>
+                      ))
+                  ) : (
+                    <button
+                      onClick={() =>
+                        handlePassTurn("")
+                      }
+                      className="bg-red-500 text-white rounded px-4 py-2"
+                    >
+                      結束本回合
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
           </>
         ) : roomData?.gameState?.phase ===
-  "action" ? (
-  <div className="mt-6 text-gray-500">
+          "action" ? (
+          <div className="mt-6 text-gray-500">
             等待
             {
               roomData?.gameState
                 ?.currentPlayerColor
             }
             色玩家行動...
-         </div>
-) : null}
+          </div>
+        ) : null}
 
         <HistoryModal
           open={showHistory}

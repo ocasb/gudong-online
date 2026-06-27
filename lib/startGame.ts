@@ -139,9 +139,8 @@ export async function startGame(
       break;
 
     default:
-      throw new Error(
-        "人數錯誤"
-      );
+  console.error("人數錯誤，目前人數：", players.length);
+  return;
   }
 
   const shuffledRoles =
@@ -245,6 +244,10 @@ export async function startGame(
   blockedAnimals: [],
 
   pendingAttacks: [],
+
+  roundSkills: {},
+
+history: [],
 
   voteResult: {
     firstPlace: "",
